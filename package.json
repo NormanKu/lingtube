@@ -1,0 +1,26 @@
+{
+  "name": "lingtube",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n client,server -c blue,green \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "npm run dev -w client",
+    "dev:server": "npm run dev -w server",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "generate": "node cli/generate.js",
+    "typecheck:client": "tsc --project client/tsconfig.json --noEmit",
+    "typecheck": "tsc --build packages/shared/tsconfig.json && tsc --project client/tsconfig.json --noEmit && tsc --project server/tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "concurrently": "^9.1.0",
+    "typescript": "^6.0.2"
+  }
+}
