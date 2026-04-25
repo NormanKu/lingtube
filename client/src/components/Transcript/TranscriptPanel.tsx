@@ -67,7 +67,7 @@ export function TranscriptPanel({
             type="button"
             ref={index === activeIndex ? activeRef : null}
             onClick={() => onSeek(segment.start)}
-            className={`block w-full border-b border-gray-50 px-4 py-2 text-left transition-colors hover:bg-blue-50 ${
+            className={`block w-full border-b border-gray-50 px-4 py-2 text-left transition-colors [contain-intrinsic-size:0_56px] [content-visibility:auto] hover:bg-blue-50 ${
               index === activeIndex ? 'border-l-4 border-l-primary-500 bg-primary-50' : ''
             }`}
           >

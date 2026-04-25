@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Bookmark, BookmarkCheck, Play } from 'lucide-react';
 import { Badge } from '../Common/Badge.jsx';
@@ -19,7 +20,7 @@ type SentenceCardProps = {
   isActive: boolean;
 };
 
-export function SentenceCard({
+function SentenceCardImpl({
   sentence,
   isFamiliar = false,
   onSeek,
@@ -39,7 +40,7 @@ export function SentenceCard({
 
   return (
     <div
-      className={`rounded-lg border p-4 transition-colors ${
+      className={`rounded-lg border p-4 transition-colors [contain-intrinsic-size:0_140px] [content-visibility:auto] ${
         isActive ? 'border-primary-300 bg-primary-50' : 'border-gray-200 bg-white hover:border-gray-300'
       }`}
     >
@@ -99,3 +100,5 @@ export function SentenceCard({
     </div>
   );
 }
+
+export const SentenceCard = memo(SentenceCardImpl);

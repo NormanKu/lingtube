@@ -190,14 +190,17 @@ export function VideoPage() {
     }
   };
 
-  const handleToggleFamiliar = (sentenceId: string) => {
-    const progress = getSentenceProgress(videoId, sentenceId);
-    if (progress.familiar) {
-      markUnfamiliar(videoId, sentenceId);
-    } else {
-      markFamiliar(videoId, sentenceId);
-    }
-  };
+  const handleToggleFamiliar = useCallback(
+    (sentenceId: string) => {
+      const progress = getSentenceProgress(videoId, sentenceId);
+      if (progress.familiar) {
+        markUnfamiliar(videoId, sentenceId);
+      } else {
+        markFamiliar(videoId, sentenceId);
+      }
+    },
+    [getSentenceProgress, markFamiliar, markUnfamiliar, videoId]
+  );
 
   if (!currentVideo && !videoId) {
     return <LoadingSpinner />;

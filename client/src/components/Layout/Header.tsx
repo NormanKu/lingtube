@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Globe, RotateCcw, Sparkles } from 'lucide-react';
 import { useLearning } from '../../hooks/useLearning';
 import { useAISettings } from '../../hooks/useAISettings';
-import { AISettingsPanel } from '../Settings/AISettingsPanel';
+
+// The settings panel pulls in the provider catalog form, validation
+// flow, and an overview page — all useless until the user opens it.
+const AISettingsPanel = lazy(() =>
+  import('../Settings/AISettingsPanel').then((m) => ({ default: m.AISettingsPanel }))
+);
 
 export function Header() {
   const { t, i18n } = useTranslation();
@@ -68,10 +73,14 @@ export function Header() {
         </nav>
       </div>
 
-      <AISettingsPanel
-        open={isAISettingsOpen}
-        onClose={() => setIsAISettingsOpen(false)}
-      />
+      {isAISettingsOpen && (
+        <Suspense fallback={null}>
+          <AISettingsPanel
+            open={isAISettingsOpen}
+            onClose={() => setIsAISettingsOpen(false)}
+          />
+        </Suspense>
+      )}
     </header>
   );
 }
