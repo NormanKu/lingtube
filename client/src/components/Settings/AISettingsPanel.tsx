@@ -137,10 +137,10 @@ export function AISettingsPanel({ open, onClose }: AISettingsPanelProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] bg-stone-950/40 px-6 py-6">
+    <div className="fixed inset-0 z-[60] bg-stone-950/40 px-2 py-2 sm:px-6 sm:py-6">
       <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto flex h-[calc(100vh-3rem)] w-full max-w-5xl overflow-hidden rounded-[32px] border border-stone-200 bg-white shadow-[0_40px_120px_-48px_rgba(15,23,42,0.65)]">
+      <div className="relative z-10 mx-auto flex h-[calc(100dvh-1rem)] w-full max-w-5xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_40px_120px_-48px_rgba(15,23,42,0.65)] sm:h-[calc(100vh-3rem)] sm:rounded-[32px]">
         <AISettingsOverview
           activeProvider={activeProvider}
           activeProviderLabel={activeProviderLabel}

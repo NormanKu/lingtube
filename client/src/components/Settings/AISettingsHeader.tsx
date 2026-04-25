@@ -23,7 +23,7 @@ export function AISettingsHeader({ onClose }: AISettingsHeaderProps) {
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full bg-stone-100 p-2 text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-700"
+          className="flex min-h-11 min-w-11 items-center justify-center rounded-full bg-stone-100 text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:bg-stone-300"
           aria-label={t('aiSettings.close')}
         >
           <X size={18} />

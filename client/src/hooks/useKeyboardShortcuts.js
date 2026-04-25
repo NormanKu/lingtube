@@ -3,8 +3,18 @@ import { useEffect } from 'react';
 export function useKeyboardShortcuts(playerRef, { onToggleLoop } = {}) {
   useEffect(() => {
     function handleKeyDown(e) {
-      // Ignore when typing in inputs
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      // Don't intercept browser/OS shortcuts (Cmd+L, Ctrl+R, Alt+Left, ...).
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      // Don't fire while the user is typing in any editable surface.
+      const target = e.target;
+      const tag = target?.tagName;
+      if (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        target?.isContentEditable
+      ) return;
 
       const player = playerRef?.current;
 

@@ -34,7 +34,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setIsAISettingsOpen(true)}
-            className="flex min-w-0 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
+            className="flex min-h-[44px] min-w-0 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:bg-primary-100 sm:min-h-0 sm:py-1.5"
           >
             <Sparkles size={15} className="shrink-0" />
             <span className="sm:inline">{t('nav.aiSettings')}</span>
@@ -45,7 +45,7 @@ export function Header() {
 
           <Link
             to="/review"
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-100"
+            className="flex min-h-[44px] items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:bg-gray-200 sm:min-h-0 sm:py-1.5"
           >
             <RotateCcw size={16} />
             <span className="hidden sm:inline">{t('nav.review')}</span>
@@ -59,7 +59,8 @@ export function Header() {
           <button
             type="button"
             onClick={toggleLang}
-            className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-100"
+            aria-label="Toggle language"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg px-2 py-2 text-sm text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:bg-gray-200 sm:min-h-0 sm:min-w-0 sm:py-1.5"
           >
             <Globe size={14} />
             {i18n.language === 'en' ? '中文' : 'EN'}
