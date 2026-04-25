@@ -1,7 +1,8 @@
 import { Router, type Request, type Response } from 'express';
-import type { AIValidationRequest } from 'lingtube-shared';
 import { createAIProvider, type AIRequestContext } from '../services/ai/index.js';
 import { getProviderCatalog } from '../services/ai/catalog.js';
+import { aiValidationRequestSchema } from '../schemas.js';
+import { sanitizeMessage } from '../utils/sanitize.js';
 
 const router = Router();
 
@@ -22,7 +23,11 @@ router.get('/providers', (_req: Request, res: Response) => {
   res.json(getProviderCatalog());
 });
 
-router.post('/validate', async (req: Request<{}, {}, AIValidationRequest>, res: Response) => {
+router.post('/validate', async (req: Request, res: Response) => {
+  const parsed = aiValidationRequestSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ ok: false, message: 'Invalid request' });
+  }
   const context = getAIRequestContext(req);
 
   if (context.keyMode === 'personal' && !context.apiKey) {
@@ -34,8 +39,9 @@ router.post('/validate', async (req: Request<{}, {}, AIValidationRequest>, res: 
     await ai.validateConnection();
     res.json({ ok: true, message: 'Connection validated successfully' });
   } catch (err) {
-    const message = (err as Error).message || 'Validation failed';
-    res.status(400).json({ ok: false, message });
+    const safe = sanitizeMessage(err) || 'Validation failed';
+    console.error('AI validation error:', safe);
+    res.status(400).json({ ok: false, message: safe });
   }
 });
 

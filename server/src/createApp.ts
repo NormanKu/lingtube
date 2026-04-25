@@ -2,13 +2,21 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { videoDataSchema } from './schemas.js';
+import { sanitizeMessage } from './utils/sanitize.js';
 import transcriptRouter from './routes/transcript.js';
 import aiRouter from './routes/ai.js';
 import aiConfigRouter from './routes/aiConfig.js';
+
+function parseAllowedOrigins(): string[] {
+  const raw = process.env.ALLOWED_ORIGINS;
+  if (!raw) return ['http://localhost:5173', 'http://127.0.0.1:5173'];
+  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+}
 
 /**
  * Build the Express app without starting a listener.
@@ -29,15 +37,49 @@ export function createApp(options: { dataDir?: string } = {}) {
   const DATA_DIR = options.dataDir ?? defaultDir;
 
   const app = express();
+  app.set('trust proxy', 1);
+
+  const allowedOrigins = parseAllowedOrigins();
 
   app.use(helmet());
-  app.use(cors());
+  app.use(
+    cors({
+      origin(origin, callback) {
+        // Same-origin / curl / server-to-server requests have no Origin header.
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('Not allowed by CORS'));
+      },
+      methods: ['GET', 'POST'],
+      allowedHeaders: ['Content-Type', 'x-lingtube-api-key'],
+      credentials: false,
+    })
+  );
   app.use(morgan('dev'));
   app.use(express.json({ limit: '1mb' }));
 
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({ status: 'ok', provider: process.env.AI_PROVIDER || 'none (CLI mode)' });
   });
+
+  // General rate limit applies to all /api/* routes registered below this line.
+  // Health check is registered earlier so monitors are not throttled.
+  const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 200,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+  });
+  // Stricter limit for AI calls — they cost money and have high latency.
+  const aiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+  });
+  app.use('/api/', generalLimiter);
+  app.use('/api/analyze', aiLimiter);
+  app.use('/api/ai/validate', aiLimiter);
 
   app.get('/api/data/:videoId', (req: Request<{ videoId: string }>, res: Response) => {
     const { videoId } = req.params;
@@ -103,7 +145,7 @@ export function createApp(options: { dataDir?: string } = {}) {
   app.use('/api/analyze', aiRouter);
 
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err.stack);
+    console.error(sanitizeMessage(err.stack ?? err.message));
     res.status(500).json({ error: 'Internal server error' });
   });
 

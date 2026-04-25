@@ -78,6 +78,53 @@ export const videoDataSchema = z.object({
   fsiDrills: z.array(fsiDrillSchema),
 });
 
+// ── Request Schemas (input validation at API boundary) ───
+
+const aiRequestOptionsSchema = z.object({
+  provider: z.string().max(32).optional(),
+  model: z.string().max(128).optional(),
+  keyMode: z.enum(['server', 'personal']).optional(),
+});
+
+const transcriptInputSegmentSchema = z.object({
+  text: z.string().max(2000),
+  start: z.number().min(0).max(86400),
+  duration: z.number().min(0).max(3600),
+});
+
+const inputSentenceSchema = z.object({
+  id: z.string().min(1).max(64),
+  original: z.string().min(1).max(2000),
+  translation: z.string().max(2000),
+  startTime: z.number().min(0).max(86400),
+  endTime: z.number().min(0).max(86400),
+  categories: z.array(categoryEnum).max(8).default([]),
+  difficulty: difficultyEnum.default('intermediate'),
+  notes: z.string().max(2000).default(''),
+});
+
+export const transcriptRequestSchema = z.object({
+  url: z.string().min(1).max(2048),
+  lang: z.string().max(16).optional(),
+});
+
+export const keySentencesRequestSchema = aiRequestOptionsSchema.extend({
+  transcript: z.array(transcriptInputSegmentSchema).min(1).max(5000),
+  targetLang: z.string().max(16).optional(),
+});
+
+export const clozeRequestSchema = aiRequestOptionsSchema.extend({
+  sentences: z.array(inputSentenceSchema).min(1).max(500),
+});
+
+export const fsiRequestSchema = aiRequestOptionsSchema.extend({
+  sentences: z.array(inputSentenceSchema).min(1).max(500),
+  difficulty: difficultyEnum.optional(),
+  drillTypes: z.array(drillTypeEnum).max(3).optional(),
+});
+
+export const aiValidationRequestSchema = aiRequestOptionsSchema;
+
 // ── Type exports (inferred from schemas) ─────────────────
 
 export type SentenceZ = z.infer<typeof sentenceSchema>;
