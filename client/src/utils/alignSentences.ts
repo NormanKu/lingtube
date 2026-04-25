@@ -1,13 +1,28 @@
+import type { Sentence, TranscriptSegment } from 'lingtube-shared';
+import type { AlignedSentence, TimingConfidence } from '../types/app';
+
 const MAX_WINDOW_SIZE = 8;
 const MIN_MATCH_SCORE = 0.72;
 const HIGH_MATCH_SCORE = 1;
 const LEAD_IN_SECONDS = 0.35;
 
-function roundTime(value) {
+interface PreparedSegment extends TranscriptSegment {
+  normalized: string;
+  tokens: string[];
+}
+
+interface BestMatch {
+  score: number;
+  startIndex: number;
+  endIndex: number;
+  windowSize: number;
+}
+
+function roundTime(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-function normalizeText(text = '') {
+function normalizeText(text = ''): string {
   return text
     .toLowerCase()
     .replace(/&/g, ' and ')
@@ -16,7 +31,7 @@ function normalizeText(text = '') {
     .trim();
 }
 
-function toTokens(text) {
+function toTokens(text: string): string[] {
   const normalized = normalizeText(text);
   if (!normalized) return [];
 
@@ -28,7 +43,12 @@ function toTokens(text) {
   return Array.from(normalized).filter((char) => char.trim());
 }
 
-function getMatchScore(sentenceText, sentenceTokens, windowText, windowTokens) {
+function getMatchScore(
+  sentenceText: string,
+  sentenceTokens: string[],
+  windowText: string,
+  windowTokens: string[]
+): number {
   if (!sentenceTokens.length || !windowTokens.length) return 0;
 
   const sentenceSet = new Set(sentenceTokens);
@@ -50,7 +70,7 @@ function getMatchScore(sentenceText, sentenceTokens, windowText, windowTokens) {
   return score;
 }
 
-function getTimingConfidence(score, shortSentence) {
+function getTimingConfidence(score: number, shortSentence: boolean): TimingConfidence {
   const minimumReliableScore = shortSentence ? HIGH_MATCH_SCORE : MIN_MATCH_SCORE;
 
   if (score >= HIGH_MATCH_SCORE) return 'high';
@@ -58,10 +78,13 @@ function getTimingConfidence(score, shortSentence) {
   return 'low';
 }
 
-export function alignSentencesToSegments(sentences = [], segments = []) {
-  if (!sentences.length || !segments.length) return sentences;
+export function alignSentencesToSegments(
+  sentences: Sentence[] = [],
+  segments: TranscriptSegment[] = []
+): AlignedSentence[] {
+  if (!sentences.length || !segments.length) return sentences as AlignedSentence[];
 
-  const preparedSegments = segments.map((segment) => ({
+  const preparedSegments: PreparedSegment[] = segments.map((segment) => ({
     ...segment,
     normalized: normalizeText(segment.text),
     tokens: toTokens(segment.text),
@@ -69,7 +92,7 @@ export function alignSentencesToSegments(sentences = [], segments = []) {
 
   let cursor = 0;
 
-  return sentences.map((sentence) => {
+  return sentences.map((sentence): AlignedSentence => {
     const sentenceText = normalizeText(sentence.original);
     const sentenceTokens = toTokens(sentence.original);
 
@@ -83,12 +106,12 @@ export function alignSentencesToSegments(sentences = [], segments = []) {
       };
     }
 
-    let bestMatch = null;
+    let bestMatch: BestMatch | null = null;
     const searchStart = Math.max(0, cursor - 2);
 
     for (let startIndex = searchStart; startIndex < preparedSegments.length; startIndex += 1) {
       let combinedText = '';
-      const combinedTokens = [];
+      const combinedTokens: string[] = [];
 
       for (
         let windowSize = 1;
@@ -121,7 +144,7 @@ export function alignSentencesToSegments(sentences = [], segments = []) {
     const timingConfidence = getTimingConfidence(bestScore, shortSentence);
     const isReliableMatch = bestMatch && timingConfidence !== 'low';
 
-    if (!isReliableMatch) {
+    if (!isReliableMatch || !bestMatch) {
       return {
         ...sentence,
         timingApproximate: true,

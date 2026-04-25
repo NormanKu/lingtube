@@ -1,10 +1,29 @@
-// Simplified SM-2 spaced repetition algorithm
-export function calculateNextReview(item, quality) {
+import type { SentenceProgress } from 'lingtube-shared';
+
+export interface DueItem extends SentenceProgress {
+  videoId: string;
+  sentenceId: string;
+}
+
+interface NextReview {
+  easeFactor: number;
+  interval: number;
+  repetitions: number;
+  lastReviewed: number;
+  nextReview: number;
+}
+
+// Simplified SM-2 spaced repetition algorithm.
+export function calculateNextReview(
+  item: Partial<SentenceProgress>,
+  quality: number
+): NextReview {
   // quality: 0-5 (0=complete failure, 5=perfect)
-  let { easeFactor = 2.5, interval = 0, repetitions = 0 } = item;
+  let easeFactor = item.easeFactor ?? 2.5;
+  let interval = item.interval ?? 0;
+  let repetitions = item.repetitions ?? 0;
 
   if (quality >= 3) {
-    // Correct response
     if (repetitions === 0) {
       interval = 1;
     } else if (repetitions === 1) {
@@ -14,19 +33,17 @@ export function calculateNextReview(item, quality) {
     }
     repetitions += 1;
   } else {
-    // Incorrect - reset
     repetitions = 0;
     interval = 1;
   }
 
-  // Update ease factor (minimum 1.3)
   easeFactor = Math.max(
     1.3,
     easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
   );
 
   const now = Date.now();
-  const nextReview = now + interval * 24 * 60 * 60 * 1000; // days to ms
+  const nextReview = now + interval * 24 * 60 * 60 * 1000;
 
   return {
     easeFactor,
@@ -37,9 +54,11 @@ export function calculateNextReview(item, quality) {
   };
 }
 
-export function getDueItems(allProgress) {
+export function getDueItems(
+  allProgress: Record<string, Record<string, SentenceProgress>>
+): DueItem[] {
   const now = Date.now();
-  const due = [];
+  const due: DueItem[] = [];
 
   for (const [videoId, sentences] of Object.entries(allProgress)) {
     for (const [sentenceId, progress] of Object.entries(sentences)) {
@@ -49,5 +68,5 @@ export function getDueItems(allProgress) {
     }
   }
 
-  return due.sort((a, b) => a.nextReview - b.nextReview);
+  return due.sort((a, b) => (a.nextReview ?? 0) - (b.nextReview ?? 0));
 }

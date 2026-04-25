@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import type { DueReviewItem } from 'lingtube-shared';
 import { learningStore } from '../stores/learningStore';
-import { calculateNextReview, getDueItems } from '../utils/srs.js';
+import { calculateNextReview, getDueItems } from '../utils/srs';
 import type { LearningProgressMap } from '../types/app';
 
 export function useLearning() {

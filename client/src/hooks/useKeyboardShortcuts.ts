@@ -1,13 +1,23 @@
 import { useEffect } from 'react';
+import type { VideoPlayerHandle } from '../components/VideoPlayer/VideoPlayer';
 
-export function useKeyboardShortcuts(playerRef, { onToggleLoop } = {}) {
+interface KeyboardShortcutOptions {
+  onToggleLoop?: () => void;
+}
+
+type PlayerRef = { current: VideoPlayerHandle | null } | null | undefined;
+
+export function useKeyboardShortcuts(
+  playerRef: PlayerRef,
+  { onToggleLoop }: KeyboardShortcutOptions = {}
+): void {
   useEffect(() => {
-    function handleKeyDown(e) {
+    function handleKeyDown(e: KeyboardEvent) {
       // Don't intercept browser/OS shortcuts (Cmd+L, Ctrl+R, Alt+Left, ...).
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       // Don't fire while the user is typing in any editable surface.
-      const target = e.target;
+      const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
       if (
         tag === 'INPUT' ||
@@ -22,9 +32,11 @@ export function useKeyboardShortcuts(playerRef, { onToggleLoop } = {}) {
         case ' ':
           e.preventDefault();
           if (player) {
-            player.getPlayerState?.() === 1
-              ? player.pauseVideo?.()
-              : player.playVideo?.();
+            if (player.getPlayerState?.() === 1) {
+              player.pauseVideo?.();
+            } else {
+              player.playVideo?.();
+            }
           }
           break;
         case 'ArrowLeft':

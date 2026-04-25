@@ -10,7 +10,7 @@ import { AvailableVideosSection, RecentVideosSection } from '../components/Home/
 import { historyStore } from '../stores/historyStore';
 import { videoStore } from '../stores/videoStore';
 import { fetchTranscript, listVideos, loadVideoData, type AvailableVideoSummary } from '../services/api';
-import { alignSentencesToSegments } from '../utils/alignSentences.js';
+import { alignSentencesToSegments } from '../utils/alignSentences';
 import type { HistoryEntry } from '../types/app';
 import type { TranscriptSegment, VideoData } from 'lingtube-shared';
 

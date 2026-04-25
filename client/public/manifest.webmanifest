@@ -1,0 +1,19 @@
+{
+  "name": "LingTube",
+  "short_name": "LingTube",
+  "description": "YouTube-driven language learning with key sentences, cloze, and FSI drills.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#0ea5e9",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { groupClozePassages } from '../../utils/groupClozePassages.js';
-import { selectSmartDrills, selectSmartPassages } from '../../utils/selectPracticeItems.js';
+import { groupClozePassages } from '../../utils/groupClozePassages';
+import { selectSmartDrills, selectSmartPassages } from '../../utils/selectPracticeItems';
 import { PracticeModeChooser } from './PracticeModeChooser.jsx';
 import { PracticeItemPicker } from './PracticeItemPicker.jsx';
 import { ClozePracticeView, DrillPracticeView } from './PracticeRunViews';

@@ -13,8 +13,8 @@ import { LoadingSpinner } from '../components/Common/LoadingSpinner.jsx';
 import { useApp } from '../contexts/AppContext';
 import { useToast } from '../contexts/ToastContext';
 import { useVideoSync } from '../hooks/useVideoSync';
-import { useSegmentLoop } from '../hooks/useSegmentLoop.js';
-import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts.js';
+import { useSegmentLoop } from '../hooks/useSegmentLoop';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { useFilteredSentences } from '../hooks/useFilteredSentences';
 import { useLearning } from '../hooks/useLearning';
 import { videoStore } from '../stores/videoStore';
@@ -26,7 +26,7 @@ import {
   generateFSIDrills,
   loadVideoData,
 } from '../services/api';
-import { alignSentencesToSegments } from '../utils/alignSentences.js';
+import { alignSentencesToSegments } from '../utils/alignSentences';
 
 export function VideoPage() {
   const params = useParams() as { videoId?: string };

@@ -1,14 +1,37 @@
+import type { ClozeExercise } from 'lingtube-shared';
+import type { AlignedSentence } from '../types/app';
+
 const MAX_GAP_SECONDS = 8;
 const MAX_PASSAGE_DURATION = 45;
 const MAX_SENTENCES_PER_PASSAGE = 4;
 
-export function groupClozePassages(clozeExercises = [], sentences = []) {
+export interface ClozePassageItem {
+  exercise: ClozeExercise;
+  sentence: AlignedSentence | null;
+  originalIndex: number;
+  startTime: number;
+  endTime: number;
+}
+
+export interface ClozePassage {
+  id: string;
+  items: ClozePassageItem[];
+  sentenceIds: string[];
+  startTime: number | null;
+  endTime: number | null;
+  blankCount: number;
+}
+
+export function groupClozePassages(
+  clozeExercises: ClozeExercise[] = [],
+  sentences: AlignedSentence[] = []
+): ClozePassage[] {
   if (!clozeExercises.length) return [];
 
   const sentenceMap = new Map(sentences.map((sentence) => [sentence.id, sentence]));
 
-  const orderedItems = clozeExercises.map((exercise, index) => {
-    const sentence = sentenceMap.get(exercise.sentenceId) || null;
+  const orderedItems: ClozePassageItem[] = clozeExercises.map((exercise, index) => {
+    const sentence = sentenceMap.get(exercise.sentenceId) ?? null;
 
     return {
       exercise,
@@ -26,14 +49,15 @@ export function groupClozePassages(clozeExercises = [], sentences = []) {
     return a.originalIndex - b.originalIndex;
   });
 
-  const passages = [];
-  let currentItems = [];
+  const passages: ClozePassage[] = [];
+  let currentItems: ClozePassageItem[] = [];
 
   const pushCurrent = () => {
     if (!currentItems.length) return;
 
     const startTime = currentItems.find((item) => Number.isFinite(item.startTime))?.startTime ?? null;
-    const endTime = [...currentItems].reverse().find((item) => Number.isFinite(item.endTime))?.endTime ?? startTime;
+    const endTime =
+      [...currentItems].reverse().find((item) => Number.isFinite(item.endTime))?.endTime ?? startTime;
 
     passages.push({
       id: `passage-${passages.length + 1}`,
@@ -57,18 +81,19 @@ export function groupClozePassages(clozeExercises = [], sentences = []) {
     const previousEnd = previous.endTime;
     const currentStart = item.startTime;
     const passageStart = currentItems[0].startTime;
-    const nextDuration = Number.isFinite(passageStart) && Number.isFinite(item.endTime)
-      ? item.endTime - passageStart
-      : Number.POSITIVE_INFINITY;
-    const gap = Number.isFinite(previousEnd) && Number.isFinite(currentStart)
-      ? currentStart - previousEnd
-      : Number.POSITIVE_INFINITY;
+    const nextDuration =
+      Number.isFinite(passageStart) && Number.isFinite(item.endTime)
+        ? item.endTime - passageStart
+        : Number.POSITIVE_INFINITY;
+    const gap =
+      Number.isFinite(previousEnd) && Number.isFinite(currentStart)
+        ? currentStart - previousEnd
+        : Number.POSITIVE_INFINITY;
 
-    const canMerge = (
+    const canMerge =
       gap <= MAX_GAP_SECONDS &&
       nextDuration <= MAX_PASSAGE_DURATION &&
-      currentItems.length < MAX_SENTENCES_PER_PASSAGE
-    );
+      currentItems.length < MAX_SENTENCES_PER_PASSAGE;
 
     if (canMerge) {
       currentItems.push(item);

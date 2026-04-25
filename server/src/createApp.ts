@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { videoDataSchema } from './schemas.js';
 import { sanitizeMessage } from './utils/sanitize.js';
+import { dailyBudgetMiddleware, tokenCapMiddleware } from './middleware/aiBudget.js';
 import transcriptRouter from './routes/transcript.js';
 import aiRouter from './routes/ai.js';
 import aiConfigRouter from './routes/aiConfig.js';
@@ -88,7 +89,7 @@ export function createApp(options: { dataDir?: string } = {}) {
     legacyHeaders: false,
   });
   app.use('/api/', generalLimiter);
-  app.use('/api/analyze', aiLimiter);
+  app.use('/api/analyze', aiLimiter, tokenCapMiddleware, dailyBudgetMiddleware);
   app.use('/api/ai/validate', aiLimiter);
 
   app.get('/api/data/:videoId', async (req: Request<{ videoId: string }>, res: Response) => {
