@@ -81,6 +81,8 @@
     "timeRange": "Time range",
     "quickPickByTime": "Quick pick by time",
     "noItemsMatch": "No items match these filters yet.",
+    "emptyCustomSelection": "No items picked yet",
+    "tryDifferentFilters": "Try loosening the filters or switch to a different selection mode.",
     "searchInItems": "Search sentence content...",
     "back": "Back",
     "progress": "Passage {{current}} / {{total}}",
@@ -186,7 +188,8 @@
     "goHome": "Go home",
     "home": {
       "loadVideos": "Couldn't load the available video list.",
-      "openVideo": "Couldn't open this video right now."
+      "openVideo": "Couldn't open this video right now.",
+      "corruptedData": "The saved data for this video is corrupted."
     },
     "video": {
       "loadData": "Couldn't load this video's transcript or saved materials.",
