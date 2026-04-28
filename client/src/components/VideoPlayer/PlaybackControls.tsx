@@ -8,7 +8,6 @@ type PlaybackControlsProps = {
   playerRef: any;
   loop: any;
   onToggleLoop: () => void;
-  onSetLoopRange?: (...args: any[]) => void;
 };
 
 export function PlaybackControls({

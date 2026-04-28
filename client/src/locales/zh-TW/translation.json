@@ -81,6 +81,8 @@
     "timeRange": "時間區段",
     "quickPickByTime": "依時間快速勾選",
     "noItemsMatch": "目前沒有符合這些條件的題目。",
+    "emptyCustomSelection": "還沒選任何段落",
+    "tryDifferentFilters": "試試看放寬篩選條件或換一種挑題方式。",
     "searchInItems": "搜尋句子內容...",
     "back": "返回",
     "progress": "第 {{current}} / {{total}} 段",
@@ -186,7 +188,8 @@
     "goHome": "回到首頁",
     "home": {
       "loadVideos": "目前無法載入可用影片清單。",
-      "openVideo": "目前無法開啟這支影片。"
+      "openVideo": "目前無法開啟這支影片。",
+      "corruptedData": "這支影片儲存的資料看起來損毀了。"
     },
     "video": {
       "loadData": "目前無法載入這支影片的逐字稿或已儲存教材。",

@@ -25,6 +25,10 @@ interface DailyBucket {
 
 const dailyBuckets = new Map<string, DailyBucket>();
 
+// Cap the in-memory map so a flood of unique callers cannot OOM the process.
+// Once we hit the cap we evict the oldest stale day's entries.
+const MAX_TRACKED_KEYS = 10_000;
+
 function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -32,10 +36,18 @@ function todayKey(): string {
 function pickKey(req: Request): string {
   // express's req.ip already honors trust-proxy. When a personal API key
   // is supplied we treat that key as the identity instead of IP, so a
-  // shared corporate IP doesn't punish individual users.
+  // shared corporate IP doesn't punish individual users. Slicing 24 chars
+  // keeps enough entropy to avoid collisions across providers.
   const personalKey = req.header('x-lingtube-api-key');
-  if (personalKey) return `key:${personalKey.slice(0, 12)}`;
+  if (personalKey) return `key:${personalKey.slice(0, 24)}`;
   return `ip:${req.ip || 'unknown'}`;
+}
+
+function pruneStaleBuckets(today: string) {
+  if (dailyBuckets.size < MAX_TRACKED_KEYS) return;
+  for (const [key, bucket] of dailyBuckets) {
+    if (bucket.day !== today) dailyBuckets.delete(key);
+  }
 }
 
 export function estimateTokens(payload: unknown): number {
@@ -61,6 +73,7 @@ export function dailyBudgetMiddleware(req: Request, res: Response, next: NextFun
   // own. This keeps the server-side OpenAI/Anthropic spend bounded.
   const key = pickKey(req);
   const today = todayKey();
+  pruneStaleBuckets(today);
   const bucket = dailyBuckets.get(key);
 
   if (!bucket || bucket.day !== today) {

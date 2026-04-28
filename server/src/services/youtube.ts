@@ -46,8 +46,8 @@ async function withRetry<T>(fn: () => Promise<T>, retries: number, label: string
       if (/disabled|not found|unavailable/i.test(message)) throw err;
       if (attempt < retries) {
         const backoff = 500 * 2 ** attempt;
-        await new Promise((r) => setTimeout(r, backoff));
         console.warn(`${label} attempt ${attempt + 1} failed, retrying in ${backoff}ms`);
+        await new Promise((r) => setTimeout(r, backoff));
       }
     }
   }

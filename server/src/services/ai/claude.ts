@@ -28,11 +28,12 @@ export class ClaudeProvider extends BaseAIProvider {
     const response = await this.client.messages.create({
       model: this.model,
       max_tokens: options.maxTokens ?? 4096,
+      ...(typeof options.temperature === 'number' ? { temperature: options.temperature } : {}),
       system: systemPrompt,
       messages: [{ role: 'user' as const, content: userPrompt }],
     });
 
     const block = response.content[0];
-    return block.type === 'text' ? block.text : '';
+    return block?.type === 'text' ? block.text : '';
   }
 }

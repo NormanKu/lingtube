@@ -26,11 +26,11 @@ export function ClozePracticeView({
     // Differentiate between "no items selected (custom mode)" vs "no items match filters"
     const isEmptyCustomSelection = selectionMode === 'custom';
     const title = isEmptyCustomSelection
-      ? t('practice.emptyCustomSelection', '還沒選任何段落')
+      ? t('practice.emptyCustomSelection')
       : t('practice.noItemsMatch');
     const description = isEmptyCustomSelection
       ? t('practice.pickPassagesDesc')
-      : t('practice.tryDifferentFilters', '試試看放寬篩選條件或換一種挑題方式。');
+      : t('practice.tryDifferentFilters');
 
     return (
       <div className="rounded-[28px] border border-stone-200 bg-white p-8 text-center shadow-[0_20px_60px_-45px_rgba(15,23,42,0.45)]">
